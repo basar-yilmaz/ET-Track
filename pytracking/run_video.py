@@ -21,15 +21,20 @@ def run_video(tracker_name, tracker_param, videofile, optional_box=None, debug=N
 
 def main():
     parser = argparse.ArgumentParser(description='Run the tracker on your webcam.')
-    parser.add_argument('tracker_name', type=str, help='Name of tracking method.')
-    parser.add_argument('tracker_param', type=str, help='Name of parameter file.')
-    parser.add_argument('videofile', type=str, help='path to a video file.')
+    # parser.add_argument('tracker_name', type=str, help='Name of tracking method.')
+    # parser.add_argument('tracker_param', type=str, help='Name of parameter file.')
+    # parser.add_argument('videofile', type=str, help='path to a video file.')
     parser.add_argument('--optional_box', type=float, default=None, nargs="+", help='optional_box with format x y w h.')
     parser.add_argument('--debug', type=int, default=0, help='Debug level.')
     parser.add_argument('--save_results', dest='save_results', action='store_true', help='Save bounding boxes')
     parser.set_defaults(save_results=False)
 
     args = parser.parse_args()
+    
+    args.tracker_name = "et_tracker"
+    args.tracker_param = "et_tracker"
+    args.videofile = "videos/skipped_video_20.mp4"
+    
 
     run_video(args.tracker_name, args.tracker_param,args.videofile, args.optional_box, args.debug, args.save_results)
 
