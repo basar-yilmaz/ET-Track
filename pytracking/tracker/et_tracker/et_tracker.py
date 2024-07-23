@@ -48,7 +48,7 @@ class TransconverTracker(BaseTracker):
         tic = time.time()
 
         # Get target position and size
-        state = torch.tensor(info['init_bbox']) # x,y,w,h
+        state = torch.tensor(info['init_bbox'][1]) # x,y,w,h
         cx, cy, w, h = get_axis_aligned_bbox(state)
         self.target_pos = np.array([cx,cy])
         self.target_sz = np.array([w,h])
@@ -177,7 +177,8 @@ class TransconverTracker(BaseTracker):
     def track(self, im, state_input, writer=None):
         self.frame_num += 1
 
-        state = state_input['previous_output']
+        # state = state_input['previous_output']
+        state = state_input
         p = state['p']
         avg_chans = state['avg_chans']
         window = state['window']

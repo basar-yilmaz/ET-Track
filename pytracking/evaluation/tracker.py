@@ -68,7 +68,6 @@ class Tracker:
 
         self.visdom = None
 
-
     def _init_visdom(self, visdom_info, debug):
         visdom_info = {} if visdom_info is None else visdom_info
         self.pause_mode = False
@@ -96,7 +95,6 @@ class Tracker:
 
             elif data['key'] == 'ArrowRight' and self.pause_mode:
                 self.step = True
-
 
     def create_tracker(self, params):
         tracker = self.tracker_class(params)
@@ -295,7 +293,8 @@ class Tracker:
 
                 x, y, w, h = cv.selectROI(display_name, frame_disp, fromCenter=False)
                 init_state = [x, y, w, h]
-                tracker.initialize(frame, _build_init_info(init_state))
+                # tracker.initialize(frame, _build_init_info(init_state))
+                state_input = tracker.initialize(frame, _build_init_info(init_state))
                 output_boxes.append(init_state)
                 break
 
@@ -307,9 +306,12 @@ class Tracker:
 
             frame_disp = frame.copy()
 
+            timer = cv.getTickCount()
             # Draw box
-            out = tracker.track(frame)
-            state = [int(s) for s in out['target_bbox'][1]]
+            out = tracker.track(frame, state_input)
+            fps = cv.getTickFrequency() / (cv.getTickCount() - timer)
+            # state = [int(s) for s in out['target_bbox'][1]]
+            state = [int(s) for s in out['target_bbox']]
             output_boxes.append(state)
 
             cv.rectangle(frame_disp, (state[0], state[1]), (state[2] + state[0], state[3] + state[1]),
@@ -322,7 +324,7 @@ class Tracker:
                        font_color, 1)
             cv.putText(frame_disp, 'Press q to quit', (20, 80), cv.FONT_HERSHEY_COMPLEX_SMALL, 1,
                        font_color, 1)
-
+            cv.putText(frame_disp, 'FPS : ' + str(int(fps)), (20, 105), cv.FONT_HERSHEY_COMPLEX_SMALL, 1, font_color, 1)
             # Display the resulting frame
             cv.imshow(display_name, frame_disp)
             key = cv.waitKey(1)
@@ -581,7 +583,6 @@ class Tracker:
             elif tracker.params.visualization:
                 self.visualize(image, out['target_bbox'], segmentation)
 
-
     def run_vot(self, debug=None, visdom_info=None):
         params = self.get_parameters()
         params.tracker_name = self.name
@@ -658,13 +659,11 @@ class Tracker:
         params = param_module.parameters()
         return params
 
-
     def init_visualization(self):
         self.pause_mode = False
         self.fig, self.ax = plt.subplots(1)
         self.fig.canvas.mpl_connect('key_press_event', self.press)
         plt.tight_layout()
-
 
     def visualize(self, image, state, segmentation=None):
         self.ax.cla()
@@ -710,6 +709,3 @@ class Tracker:
     def _read_image(self, image_file: str):
         im = cv.imread(image_file)
         return cv.cvtColor(im, cv.COLOR_BGR2RGB)
-
-
-

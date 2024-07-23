@@ -7,7 +7,7 @@ def parameters():
     params.debug = 0
     params.visualization = False
 
-    params.use_gpu = False
+    params.use_gpu = True # Can be set to False to run on CPU
 
     params.checkpoint_epoch = 35
 
